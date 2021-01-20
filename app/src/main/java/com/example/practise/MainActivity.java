@@ -4,8 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,13 +18,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.net.URL;
-import java.util.NoSuchElementException;
 
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.module.AppGlideModule;
-import com.bumptech.glide.request.RequestOptions;
 
 public class MainActivity extends AppCompatActivity {
      String value, url, xyz;
@@ -40,25 +32,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tv = findViewById(R.id.textView);
-        tv.setHint("Image will be displayed here");
         editText = findViewById(R.id.edit_text);
         imageView = findViewById(R.id.imageView);
         imageView.setImageResource(R.drawable.welcome);
         search = findViewById(R.id.search_Btn);
         search.setOnClickListener(v -> {
             xyz = editText.getText().toString();
-            System.out.println(xyz);
-            url = "https://www.amazon.in/s?k=" + xyz + "&crid=24WYPNHZGYNIJ&sprefix=keyb%2Caps%2C282&ref=nb_sb_ss_ts-a-p_7_4";
+            url = "https://www.amazon.in/s?k=" + xyz + "&crid=1XXFNAX736QQI&sprefix=jean%2Caps%2C381&ref=nb_sb_ss_ts-a-p_4_4" ;
             new scratch(tv, value, url).execute();
 });
 
         }
 
     public  class scratch extends AsyncTask<String, String , String > {
-        String value;
+        String value, name, link, url;
+        Elements tags;
         TextView tv;
-        String url;
-        Elements allinfo;
+        Elements allinfo1;
+        Element allinfo2;
         Document doc;
 
 
@@ -79,12 +70,14 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             try {
               doc = Jsoup.connect(url).get();
-                allinfo = doc.select("div[class=\"a-section aok-relative s-image-fixed-height\"]");
-                Elements tags = allinfo.select("img[class=\"s-image\"]");
-                String name = tags.attr("alt");
+                allinfo1 = doc.select("a[class=\"a-link-normal a-text-normal\"]");
+                allinfo2 = doc.select("a[class=\"a-link-normal s-no-outline\"]").first();
+                tags = allinfo2.getElementsByTag("img");
+                link = tags.attr("src");
+                name = tags.attr("alt");
+                System.out.println(name);
                 name = name.replace("Sponsored Ad - ", "");
                 value= name;
-                String link = tags.attr("src");
                 runOnUiThread(() -> Glide.with(MainActivity.this).load(link).fitCenter().into(imageView));
 
             } catch (IOException e) {
